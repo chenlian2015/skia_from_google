@@ -86,6 +86,34 @@ struct SkScalerContextRec {
     void    getSingleMatrix(SkMatrix*) const;
     void    getSingleMatrixWithoutTextSize(SkMatrix*) const;
 
+    /** The kind of scale which will be applied by the underlying port (pre-matrix). */
+    enum PreMatrixScale {
+        kFull_PreMatrixScale,  // The underlying port can apply both x and y scale.
+        kVertical_PreMatrixScale,  // The underlying port can only apply a y scale.
+        kVerticalInteger_PreMatrixScale  // The underlying port can only apply an integer y scale.
+    };
+    /**
+     *  Compute useful matrices for use with sizing.
+     *
+     *  There are two kinds of text size, a 'requested/logical size' which is like asking for size
+     *  '12' and a 'real' size which is the size after the matrix is applied. The matrices produced
+     *  by this method are based on the 'real' size.
+     *
+     *  The parameters 'scale' and 'remaining' are required, the other pointers may be NULL.
+     *
+     *  @param preMatrixScale the kind of scale to extract from the total matrix.
+     *  @param scale the scale extracted from the total matrix (both values positive).
+     *  @param remaining apply after scale to apply the total matrix.
+     *  @param remainingWithoutRotation apply after scale to apply the total matrix sans rotation.
+     *  @param remainingRotation apply after remainingWithoutRotation to apply the total matrix.
+     *  @param total the total matrix.
+     */
+    void computeMatrices(PreMatrixScale preMatrixScale,
+                         SkVector* scale, SkMatrix* remaining,
+                         SkMatrix* remainingWithoutRotation = NULL,
+                         SkMatrix* remainingRotation = NULL,
+                         SkMatrix* total = NULL);
+
     inline SkPaint::Hinting getHinting() const;
     inline void setHinting(SkPaint::Hinting);
 
